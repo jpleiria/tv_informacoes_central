@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Informações - Slideshow</title>
+    <style>
+        /* Estilo para garantir que o iframe ocupe toda a área visível */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Evita barras de rolagem no corpo da página */
+        }
+        #site-frame {
+            width: 100%;
+            height: 100%;
+            border: none; /* Remove a borda padrão do iframe */
+        }
+    </style>
+</head>
+<body>
+
+    <iframe id="site-frame" src="" title="Slideshow de Páginas Operacionais"></iframe>
+
+    <script>
+        // Lista de todos os URLs e tempos de exibição (em milissegundos)
+        const sites = [
+            { nome: "Relógio", url: "https://jpleiria.github.io/Relogio_painel/", tempo: 30000 }, // 30 segundos
+            { nome: "Viaturas", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=VIATU&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 20000 }, // 20 segundos
+            { nome: "Bombeiros", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=BOMBE&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 15000 } // 15 segundos
+        ];
+
+        let indiceAtual = 0;
+        const iframe = document.getElementById('site-frame');
+
+        /**
+         * Função principal para carregar o próximo site e agendar o próximo.
+         */
+        function carregarProximoSite() {
+            const siteAtual = sites[indiceAtual];
+            
+            // 1. Define o iframe src para o novo URL
+            console.log(`Carregando: ${siteAtual.nome} por ${siteAtual.tempo / 1000} segundos`);
+            iframe.src = siteAtual.url;
+
+            // 2. Calcula o índice para a próxima iteração
+            // Volta a 0 para criar um loop contínuo (slideshow infinito).
+            indiceAtual = (indiceAtual + 1) % sites.length; 
+
+            // 3. Configura o temporizador para chamar esta função novamente após o tempo definido.
+            setTimeout(carregarProximoSite, siteAtual.tempo);
+        }
+
+        // 4. Inicia o slideshow
+        carregarProximoSite();
+    </script>
+
+</body>
+</html>
