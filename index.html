@@ -5,17 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Informações - Slideshow</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-        #site-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        #site-frame { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
@@ -31,43 +22,54 @@
 
         const URL_TROCA_TURNO = "https://jpleiria.github.io/troca_turno/";
         let indiceAtual = 0;
+        let timeoutSlideshow;
         const iframe = document.getElementById('site-frame');
 
-        function carregarProximoSite() {
+        function gerenciarSlideshow() {
             const agora = new Date();
             const hora = agora.getHours();
             const minuto = agora.getMinutes();
 
-            let urlParaCarregar;
-            let tempoDeEspera;
-
-            // NOVA REGRA: Troca de Turno (08h00 ou 20h00 por exatamente 1 minuto)
+            // Prioridade máxima: Troca de Turno
             if ((hora === 8 || hora === 20) && minuto === 0) {
-                console.log("Horário de Troca de Turno detectado.");
-                urlParaCarregar = URL_TROCA_TURNO;
-                tempoDeEspera = 10000; // Verifica a cada 10s para ver se o minuto já passou
+                if (iframe.src !== URL_TROCA_TURNO) {
+                    console.log("Iniciando Troca de Turno IMEDIATA.");
+                    iframe.src = URL_TROCA_TURNO;
+                    clearTimeout(timeoutSlideshow); // Para o slideshow normal
+                }
             } else {
-                // FLUXO NORMAL DO SLIDESHOW
-                const siteAtual = sites[indiceAtual];
-                urlParaCarregar = siteAtual.url;
-                tempoDeEspera = siteAtual.tempo;
-
-                console.log(`Carregando: ${siteAtual.nome}`);
-                
-                // Prepara o próximo índice
-                indiceAtual = (indiceAtual + 1) % sites.length;
+                // Se não é hora de troca, executa o carrossel normal
+                executarCarrossel();
             }
-
-            // Atualiza o iframe apenas se a URL for diferente da atual
-            if (iframe.src !== urlParaCarregar) {
-                iframe.src = urlParaCarregar;
-            }
-
-            // Agenda a próxima transição
-            setTimeout(carregarProximoSite, tempoDeEspera);
         }
 
-        carregarProximoSite();
+        function executarCarrossel() {
+            const siteAtual = sites[indiceAtual];
+            
+            // Só troca se não estiver já no site certo (evita refresh desnecessário)
+            if (iframe.src !== siteAtual.url) {
+                console.log(`Carregando slide: ${siteAtual.nome}`);
+                iframe.src = siteAtual.url;
+            }
+
+            indiceAtual = (indiceAtual + 1) % sites.length;
+            
+            // Agenda o próximo slide
+            clearTimeout(timeoutSlideshow);
+            timeoutSlideshow = setTimeout(gerenciarSlideshow, siteAtual.tempo);
+        }
+
+        // Verifica a cada 1 segundo se bateu o horário de Troca de Turno
+        // Isso garante precisão absoluta no horário
+        setInterval(() => {
+            const agora = new Date();
+            if (agora.getMinutes() === 0 && agora.getSeconds() === 0 && (agora.getHours() === 8 || agora.getHours() === 20)) {
+                gerenciarSlideshow();
+            }
+        }, 1000);
+
+        // Início imediato
+        gerenciarSlideshow();
     </script>
 </body>
 </html>
