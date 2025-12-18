@@ -21,55 +21,52 @@
         ];
 
         const URL_TROCA_TURNO = "https://jpleiria.github.io/troca_turno/";
+        const DURACAO_TROCA_TURNO = 60000; // Quanto tempo a tela de troca fica visível (ex: 60s)
+        
         let indiceAtual = 0;
         let timeoutSlideshow;
+        let emTrocaDeTurno = false; // Variável de controlo
         const iframe = document.getElementById('site-frame');
 
-        function gerenciarSlideshow() {
+        function carregarSlideshow() {
+            if (emTrocaDeTurno) return; // Se estiver na troca de turno, não muda o slide
+
+            const siteAtual = sites[indiceAtual];
+            console.log(`Carregando: ${siteAtual.nome}`);
+            iframe.src = siteAtual.url;
+
+            indiceAtual = (indiceAtual + 1) % sites.length;
+            timeoutSlideshow = setTimeout(carregarSlideshow, siteAtual.tempo);
+        }
+
+        function verificarHorario() {
             const agora = new Date();
             const hora = agora.getHours();
             const minuto = agora.getMinutes();
+            const segundo = agora.getSeconds();
 
-            // Prioridade máxima: Troca de Turno
-            if ((hora === 8 || hora === 20) && minuto === 0) {
-                if (iframe.src !== URL_TROCA_TURNO) {
-                    console.log("Iniciando Troca de Turno IMEDIATA.");
-                    iframe.src = URL_TROCA_TURNO;
-                    clearTimeout(timeoutSlideshow); // Para o slideshow normal
-                }
-            } else {
-                // Se não é hora de troca, executa o carrossel normal
-                executarCarrossel();
+            // Ativa exatamente às 08:00:00 ou 20:00:00
+            if ((hora === 8 || hora === 20) && minuto === 0 && segundo === 0 && !emTrocaDeTurno) {
+                console.log("Iniciando período de Troca de Turno.");
+                
+                emTrocaDeTurno = true;
+                clearTimeout(timeoutSlideshow); // Para o carrossel
+                iframe.src = URL_TROCA_TURNO;
+
+                // Após o tempo definido, volta ao normal
+                setTimeout(() => {
+                    console.log("Fim da Troca de Turno. Voltando ao slideshow.");
+                    emTrocaDeTurno = false;
+                    carregarSlideshow(); 
+                }, DURACAO_TROCA_TURNO);
             }
         }
 
-        function executarCarrossel() {
-            const siteAtual = sites[indiceAtual];
-            
-            // Só troca se não estiver já no site certo (evita refresh desnecessário)
-            if (iframe.src !== siteAtual.url) {
-                console.log(`Carregando slide: ${siteAtual.nome}`);
-                iframe.src = siteAtual.url;
-            }
+        // Verifica o relógio a cada 1 segundo para precisão
+        setInterval(verificarHorario, 1000);
 
-            indiceAtual = (indiceAtual + 1) % sites.length;
-            
-            // Agenda o próximo slide
-            clearTimeout(timeoutSlideshow);
-            timeoutSlideshow = setTimeout(gerenciarSlideshow, siteAtual.tempo);
-        }
-
-        // Verifica a cada 1 segundo se bateu o horário de Troca de Turno
-        // Isso garante precisão absoluta no horário
-        setInterval(() => {
-            const agora = new Date();
-            if (agora.getMinutes() === 0 && agora.getSeconds() === 0 && (agora.getHours() === 8 || agora.getHours() === 20)) {
-                gerenciarSlideshow();
-            }
-        }, 1000);
-
-        // Início imediato
-        gerenciarSlideshow();
+        // Inicia o slideshow pela primeira vez
+        carregarSlideshow();
     </script>
 </body>
 </html>
