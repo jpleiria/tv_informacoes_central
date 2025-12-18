@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Informações - Slideshow</title>
     <style>
-        /* Estilo para garantir que o iframe ocupe toda a área visível */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden; /* Evita barras de rolagem no corpo da página */
+            overflow: hidden;
         }
         #site-frame {
             width: 100%;
             height: 100%;
-            border: none; /* Remove a borda padrão do iframe */
+            border: none;
         }
     </style>
 </head>
@@ -24,37 +23,51 @@
     <iframe id="site-frame" src="" title="Slideshow de Páginas Operacionais"></iframe>
 
     <script>
-        // Lista de todos os URLs e tempos de exibição (em milissegundos)
         const sites = [
-            { nome: "Relógio", url: "https://jpleiria.github.io/Relogio_painel/", tempo: 30000 }, // 30 segundos
-            { nome: "Viaturas", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=VIATU&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 20000 }, // 20 segundos
-            { nome: "Bombeiros", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=BOMBE&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 15000 } // 15 segundos
+            { nome: "Relógio", url: "https://jpleiria.github.io/Relogio_painel/", tempo: 30000 },
+            { nome: "Viaturas", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=VIATU&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 20000 },
+            { nome: "Bombeiros", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=BOMBE&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 15000 }
         ];
 
+        const URL_TROCA_TURNO = "https://jpleiria.github.io/troca_turno/";
         let indiceAtual = 0;
         const iframe = document.getElementById('site-frame');
 
-        /**
-         * Função principal para carregar o próximo site e agendar o próximo.
-         */
         function carregarProximoSite() {
-            const siteAtual = sites[indiceAtual];
-            
-            // 1. Define o iframe src para o novo URL
-            console.log(`Carregando: ${siteAtual.nome} por ${siteAtual.tempo / 1000} segundos`);
-            iframe.src = siteAtual.url;
+            const agora = new Date();
+            const hora = agora.getHours();
+            const minuto = agora.getMinutes();
 
-            // 2. Calcula o índice para a próxima iteração
-            // Volta a 0 para criar um loop contínuo (slideshow infinito).
-            indiceAtual = (indiceAtual + 1) % sites.length; 
+            let urlParaCarregar;
+            let tempoDeEspera;
 
-            // 3. Configura o temporizador para chamar esta função novamente após o tempo definido.
-            setTimeout(carregarProximoSite, siteAtual.tempo);
+            // NOVA REGRA: Troca de Turno (08h00 ou 20h00 por exatamente 1 minuto)
+            if ((hora === 8 || hora === 20) && minuto === 0) {
+                console.log("Horário de Troca de Turno detectado.");
+                urlParaCarregar = URL_TROCA_TURNO;
+                tempoDeEspera = 10000; // Verifica a cada 10s para ver se o minuto já passou
+            } else {
+                // FLUXO NORMAL DO SLIDESHOW
+                const siteAtual = sites[indiceAtual];
+                urlParaCarregar = siteAtual.url;
+                tempoDeEspera = siteAtual.tempo;
+
+                console.log(`Carregando: ${siteAtual.nome}`);
+                
+                // Prepara o próximo índice
+                indiceAtual = (indiceAtual + 1) % sites.length;
+            }
+
+            // Atualiza o iframe apenas se a URL for diferente da atual
+            if (iframe.src !== urlParaCarregar) {
+                iframe.src = urlParaCarregar;
+            }
+
+            // Agenda a próxima transição
+            setTimeout(carregarProximoSite, tempoDeEspera);
         }
 
-        // 4. Inicia o slideshow
         carregarProximoSite();
     </script>
-
 </body>
 </html>
