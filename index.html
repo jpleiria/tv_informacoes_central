@@ -1,73 +1,156 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Informações - Slideshow</title>
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        #site-frame { width: 100%; height: 100%; border: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Risco Incêndio Rural</title>
+  <style>
+    :root{--bg:#07111f;--card:#0f1b2d;--card2:#12233a;--text:#eaf2ff;--muted:#9fb2cc;--line:#223652;--accent:#ff4d4d}
+    *{box-sizing:border-box} 
+    body{margin:0;font-family:Inter,sans-serif;background:var(--bg);color:var(--text)}
+    
+    .wrap{max-width:1400px;margin:0 auto;padding:20px}
+    h1{font-size:22px; text-align: center; margin-bottom: 10px; color: #fff; letter-spacing: 1px; text-transform: uppercase;}
+    
+    /* Data aumentada e destacada */
+    #data-atual {
+      text-align: center;
+      color: var(--text);
+      font-size: 24px; /* Tamanho aumentado */
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-transform: capitalize;
+      display: block;
+    }
+
+    .concelhos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); 
+      gap: 15px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 10px 0;
+      text-align: center;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .graph-box {
+      position: relative;
+      width: 260px; 
+      height: 160px; 
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .graph-box iframe {
+      position: absolute;
+      top: -180px; 
+      left: -65px; 
+      width: 400px; 
+      height: 500px;
+      border: none;
+      transform: scale(1.05); 
+      transform-origin: top left;
+      pointer-events: none;
+    }
+
+    .footer { text-align: center; margin-top: 40px; color: var(--muted); font-size: 11px; opacity: 0.6; }
+  </style>
 </head>
 <body>
 
-    <iframe id="site-frame" src="" title="Slideshow de Páginas Operacionais"></iframe>
+<div class="wrap">
+  <h1>Risco de Incêndio Rural</h1>
+  <div id="data-atual"></div>
 
-    <script>
-        const sites = [
-            { nome: "Relógio", url: "https://jpleiria.github.io/Relogio_painel/", tempo: 30000 },
-            { nome: "Viaturas", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=VIATU&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 20000 },
-            { nome: "Bombeiros", url: "https://app.gescorp.pt/app/quartel/fvd.php?display=BOMBE&key=xuvPnG2JEsuVNy%2FEK9%2Ff%2BhkLSOKo%2BBWl%3ADsDe5ZjIOcb9Bg9kQ1zTUBc3gOmptb4%2B", tempo: 15000 },
-            { nome: "Transito", url: "https://jpleiria.github.io/transito_tempo_real/", tempo: 20000 }
-        ];
+  <div class="concelhos-grid">
+    <div class="card">
+      <h2>Leiria</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Leiria" scrolling="no"></iframe>
+      </div>
+    </div>
 
-        const URL_TROCA_TURNO = "https://jpleiria.github.io/troca_turno/";
-        const DURACAO_TROCA_TURNO = 60000; // Quanto tempo a tela de troca fica visível (ex: 60s)
-        
-        let indiceAtual = 0;
-        let timeoutSlideshow;
-        let emTrocaDeTurno = false; // Variável de controlo
-        const iframe = document.getElementById('site-frame');
+    <div class="card">
+      <h2>Alcobaça</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Alcobaça" scrolling="no"></iframe>
+      </div>
+    </div>
 
-        function carregarSlideshow() {
-            if (emTrocaDeTurno) return; // Se estiver na troca de turno, não muda o slide
+    <div class="card">
+      <h2>Batalha</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Batalha" scrolling="no"></iframe>
+      </div>
+    </div>
 
-            const siteAtual = sites[indiceAtual];
-            console.log(`Carregando: ${siteAtual.nome}`);
-            iframe.src = siteAtual.url;
+    <div class="card">
+      <h2>Marinha Grande</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Marinha+Grande" scrolling="no"></iframe>
+      </div>
+    </div>
 
-            indiceAtual = (indiceAtual + 1) % sites.length;
-            timeoutSlideshow = setTimeout(carregarSlideshow, siteAtual.tempo);
-        }
+    <div class="card">
+      <h2>Ourém</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Santarém&x_Concelho=Ourém" scrolling="no"></iframe>
+      </div>
+    </div>
 
-        function verificarHorario() {
-            const agora = new Date();
-            const hora = agora.getHours();
-            const minuto = agora.getMinutes();
-            const segundo = agora.getSeconds();
+    <div class="card">
+      <h2>Pombal</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Pombal" scrolling="no"></iframe>
+      </div>
+    </div>
 
-            // Ativa exatamente às 08:00:00 ou 20:00:00
-            if ((hora === 8 || hora === 20) && minuto === 0 && segundo === 0 && !emTrocaDeTurno) {
-                console.log("Iniciando período de Troca de Turno.");
-                
-                emTrocaDeTurno = true;
-                clearTimeout(timeoutSlideshow); // Para o carrossel
-                iframe.src = URL_TROCA_TURNO;
+    <div class="card">
+      <h2>Porto de Mós</h2>
+      <div class="graph-box">
+        <iframe src="https://fogos.icnf.pt/rif/Stat_Global_Sensibilizacao_Riscolist2.asp?x_Distrito=Leiria&x_Concelho=Porto+de+Mós" scrolling="no"></iframe>
+      </div>
+    </div>
+  </div>
 
-                // Após o tempo definido, volta ao normal
-                setTimeout(() => {
-                    console.log("Fim da Troca de Turno. Voltando ao slideshow.");
-                    emTrocaDeTurno = false;
-                    carregarSlideshow(); 
-                }, DURACAO_TROCA_TURNO);
-            }
-        }
+  <div class="footer">
+    Monitorização em Tempo Real | Atualização automática total a cada 60 min.
+  </div>
+</div>
 
-        // Verifica o relógio a cada 1 segundo para precisão
-        setInterval(verificarHorario, 1000);
+<script>
+  // Função para mostrar a data atual formatada
+  function exibirData() {
+    const agora = new Date();
+    const opcoes = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-PT', opcoes);
+  }
 
-        // Inicia o slideshow pela primeira vez
-        carregarSlideshow();
-    </script>
+  // Executa ao abrir a página
+  exibirData();
+
+  // ATUALIZAÇÃO AUTOMÁTICA TOTAL:
+  // Recarrega a página inteira a cada 60 minutos (3600000 ms)
+  // Isso garante que a data mude e os iframes do ICNF puxem dados novos.
+  setTimeout(() => {
+    window.location.reload();
+  }, 3600000);
+</script>
+
 </body>
 </html>
